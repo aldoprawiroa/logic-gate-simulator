@@ -1,6 +1,6 @@
 # 🔌 Logic Gate Simulator
 
-![Logic Gate Simulator Demo](assets/logic-gate-simulator.png)
+![Logic Gate Simulator Demo](assets/img/logic-gate-simulator.jpg)
 
 Sebuah aplikasi web interaktif dan minimalis untuk memvisualisasikan dan mensimulasikan cara kerja gerbang logika (Logic Gates). Proyek ini dirancang khusus untuk membantu mahasiswa IT pemula dan siswa yang sedang mempelajari mata kuliah Sistem Digital.
 
