@@ -1,0 +1,488 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulator Gerbang Logika - AldoPrawiroA.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            background-image: 
+                radial-gradient(circle at 50% 50%, #1e293b 1px, transparent 1px),
+                linear-gradient(to right, #0f172a, #0f172a);
+            background-size: 24px 24px, 100% 100%;
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* Neon Glow Effects */
+        .wire {
+            fill: none;
+            stroke-width: 6;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .wire-off {
+            stroke: #334155;
+        }
+
+        .wire-on {
+            stroke: #06b6d4; /* Cyan neon */
+            filter: drop-shadow(0 0 8px #06b6d4) drop-shadow(0 0 12px #06b6d4);
+        }
+
+        .wire-on-alt {
+            stroke: #10b981; /* Green neon for output */
+            filter: drop-shadow(0 0 8px #10b981) drop-shadow(0 0 16px #10b981);
+        }
+
+        /* Gate Styles */
+        .gate-body {
+            fill: #1e293b;
+            stroke: #64748b;
+            stroke-width: 4;
+            transition: all 0.3s;
+        }
+
+        .gate-active .gate-body {
+            stroke: #3b82f6;
+            filter: drop-shadow(0 0 6px rgba(59, 130, 246, 0.5));
+        }
+
+        /* Interactive Switches */
+        .switch-node {
+            transition: all 0.2s;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+        }
+        .switch-node:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+        .switch-node:active {
+            transform: translate(-50%, -50%) scale(0.95);
+        }
+        
+        .switch-off {
+            background-color: #ef4444; /* Red */
+            border-color: #b91c1c;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
+        }
+        
+        .switch-on {
+            background-color: #06b6d4; /* Cyan */
+            border-color: #0891b2;
+            box-shadow: 0 0 15px #06b6d4, inset 0 2px 4px rgba(255,255,255,0.3);
+            text-shadow: 0 0 5px white;
+        }
+
+        /* The Light Bulb */
+        .bulb-glass {
+            transition: all 0.5s ease;
+        }
+        .bulb-off {
+            fill: #1e293b;
+            stroke: #475569;
+        }
+        .bulb-on {
+            fill: #fde047;
+            stroke: #eab308;
+            filter: drop-shadow(0 0 20px #fde047) drop-shadow(0 0 40px #eab308);
+        }
+
+        /* Custom Scrollbar for the table */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center p-4 md:p-8">
+
+    <!-- Header -->
+    <header class="text-center mb-8">
+        <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 mb-2">
+            Simulator Gerbang Logika
+        </h1>
+        <p class="text-slate-400 font-medium tracking-wide">Alat Bantu Belajar Sistem Digital - UNIMUS</p>
+    </header>
+
+    <!-- Main Content -->
+    <main class="w-full max-w-6xl flex flex-col lg:flex-row gap-8">
+        
+        <!-- Left Side: Simulator Canvas -->
+        <div class="flex-1 flex flex-col gap-4">
+            
+            <!-- Gate Selection Menu -->
+            <div class="bg-slate-800/80 p-3 rounded-2xl border border-slate-700 flex flex-wrap gap-2 shadow-xl backdrop-blur-sm">
+                <span class="text-slate-400 text-sm w-full font-semibold uppercase tracking-wider mb-1 px-2">Pilih Gerbang:</span>
+                <div class="flex flex-wrap gap-2 w-full" id="gate-menu">
+                    <!-- Buttons injected via JS -->
+                </div>
+            </div>
+
+            <!-- The Interactive Circuit Board -->
+            <div class="relative w-full bg-slate-900/90 rounded-2xl border-2 border-slate-700 shadow-2xl overflow-hidden" style="aspect-ratio: 2/1;" id="canvas-container">
+                
+                <!-- SVG Canvas for Wires and Gates -->
+                <svg viewBox="0 0 800 400" class="absolute inset-0 w-full h-full pointer-events-none">
+                    
+                    <!-- Wires Behind -->
+                    <path id="wire-a" d="" class="wire wire-off"></path>
+                    <path id="wire-b" d="" class="wire wire-off"></path>
+                    <path id="wire-out" d="" class="wire wire-off"></path>
+
+                    <!-- Gate Symbol Group -->
+                    <g id="gate-group" class="gate-active" transform="translate(0,0)">
+                        <!-- XOR Extra Back Curve -->
+                        <path id="gate-xor-back" d="" fill="none" class="hidden stroke-slate-500" stroke-width="4"></path>
+                        
+                        <!-- Main Gate Body -->
+                        <path id="gate-shape" d="" class="gate-body"></path>
+                        
+                        <!-- Inverter Circle (For NOT, NAND, NOR) -->
+                        <circle id="gate-invert" cx="0" cy="0" r="10" class="hidden gate-body"></circle>
+                        
+                        <!-- Gate Text Label -->
+                        <text id="gate-label" x="400" y="205" font-family="JetBrains Mono" font-size="24" font-weight="bold" fill="#94a3b8" text-anchor="middle" dominant-baseline="middle">AND</text>
+                    </g>
+                    
+                    <!-- Output Bulb SVG -->
+                    <g transform="translate(700, 200)">
+                        <!-- Bulb Base -->
+                        <rect x="-10" y="25" width="20" height="15" rx="2" fill="#475569"></rect>
+                        <rect x="-12" y="40" width="24" height="6" rx="1" fill="#334155"></rect>
+                        <!-- Bulb Glass -->
+                        <path id="bulb-glass" d="M 0 -30 C 25 -30, 25 0, 15 15 C 10 22, 10 25, 10 25 L -10 25 C -10 25, -10 22, -15 15 C -25 0, -25 -30, 0 -30 Z" class="bulb-glass bulb-off stroke-2"></path>
+                        <!-- Filament -->
+                        <path d="M -5 25 L -5 5 L 5 5 L 5 25" fill="none" stroke="#64748b" stroke-width="2"></path>
+                    </g>
+                </svg>
+
+                <!-- Interactive HTML Overlays (Switches) -->
+                <!-- Switch A -->
+                <button id="switch-a" class="switch-node absolute w-12 h-12 md:w-16 md:h-16 rounded-full border-4 text-xl md:text-2xl font-bold text-white mono flex items-center justify-center cursor-pointer z-10"
+                        style="left: 8%; top: 25%; transform: translate(-50%, -50%);"
+                        onclick="toggleInput('A')">
+                    0
+                </button>
+                <div id="label-a" class="absolute text-slate-400 mono font-bold text-sm md:text-base pointer-events-none" style="left: 8%; top: calc(25% - 40px); transform: translateX(-50%);">IN A</div>
+
+                <!-- Switch B -->
+                <button id="switch-b" class="switch-node absolute w-12 h-12 md:w-16 md:h-16 rounded-full border-4 text-xl md:text-2xl font-bold text-white mono flex items-center justify-center cursor-pointer z-10"
+                        style="left: 8%; top: 75%; transform: translate(-50%, -50%);"
+                        onclick="toggleInput('B')">
+                    0
+                </button>
+                <div id="label-b" class="absolute text-slate-400 mono font-bold text-sm md:text-base pointer-events-none" style="left: 8%; top: calc(75% + 25px); transform: translateX(-50%);">IN B</div>
+
+                <!-- Output Label -->
+                <div class="absolute text-slate-400 mono font-bold text-sm md:text-base pointer-events-none" style="left: 87.5%; top: calc(50% + 45px); transform: translateX(-50%);">OUT</div>
+            </div>
+            
+            <!-- Description Box -->
+            <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50">
+                <h3 class="text-blue-400 font-bold mb-1 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Fungsi Gerbang <span id="desc-title">AND</span>
+                </h3>
+                <p id="desc-text" class="text-slate-300 text-sm leading-relaxed">
+                    Menghasilkan output 1 (menyala) hanya jika semua input bernilai 1.
+                </p>
+            </div>
+        </div>
+
+        <!-- Right Side: Truth Table -->
+        <div class="w-full lg:w-80 flex flex-col gap-4">
+            <div class="bg-slate-800/80 rounded-2xl border border-slate-700 shadow-xl overflow-hidden flex-1 backdrop-blur-sm flex flex-col">
+                <div class="p-4 bg-slate-800 border-b border-slate-700">
+                    <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                        <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        Tabel Kebenaran
+                    </h2>
+                </div>
+                <div class="p-4 flex-1 overflow-auto">
+                    <table class="w-full text-center border-collapse">
+                        <thead id="table-head">
+                            <!-- Headers injected via JS -->
+                        </thead>
+                        <tbody id="table-body" class="mono text-sm">
+                            <!-- Rows injected via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Script Logic (DOM Manipulation Murni) -->
+    <script>
+        // --- DATA GERBANG LOGIKA ---
+        const gateData = {
+            'AND': { 
+                inputs: 2, 
+                calc: (a, b) => a && b, 
+                path: 'M 340 140 L 400 140 A 60 60 0 0 1 400 260 L 340 260 Z',
+                invert: false,
+                isXor: false,
+                desc: 'Gerbang dasar. Menghasilkan output 1 (menyala) hanya jika <b>semua</b> input bernilai 1.'
+            },
+            'OR': { 
+                inputs: 2, 
+                calc: (a, b) => a || b, 
+                path: 'M 340 140 Q 385 140 460 200 Q 385 260 340 260 Q 370 200 340 140 Z',
+                invert: false,
+                isXor: false,
+                desc: 'Gerbang dasar. Menghasilkan output 1 (menyala) jika <b>salah satu atau semua</b> input bernilai 1.'
+            },
+            'NOT': { 
+                inputs: 1, 
+                calc: (a) => !a, 
+                path: 'M 340 160 L 440 200 L 340 240 Z',
+                invert: true,
+                isXor: false,
+                desc: 'Gerbang Inverter. Membalikkan logika. Jika input 1 menjadi 0, jika input 0 menjadi 1.'
+            },
+            'NAND': { 
+                inputs: 2, 
+                calc: (a, b) => !(a && b), 
+                path: 'M 340 140 L 400 140 A 60 60 0 0 1 400 260 L 340 260 Z',
+                invert: true,
+                isXor: false,
+                desc: 'Not-AND. Kebalikan dari AND. Menghasilkan output 0 hanya jika semua input bernilai 1.'
+            },
+            'NOR': { 
+                inputs: 2, 
+                calc: (a, b) => !(a || b), 
+                path: 'M 340 140 Q 385 140 460 200 Q 385 260 340 260 Q 370 200 340 140 Z',
+                invert: true,
+                isXor: false,
+                desc: 'Not-OR. Kebalikan dari OR. Menghasilkan output 1 hanya jika semua input bernilai 0.'
+            },
+            'XOR': { 
+                inputs: 2, 
+                calc: (a, b) => a !== b, 
+                path: 'M 340 140 Q 385 140 460 200 Q 385 260 340 260 Q 370 200 340 140 Z',
+                invert: false,
+                isXor: true,
+                desc: 'Exclusive-OR. Menghasilkan output 1 jika kedua input <b>berbeda</b> (satu 1 dan lainnya 0).'
+            }
+        };
+
+        // --- STATE APLIKASI ---
+        let currentGate = 'AND';
+        let stateA = 0;
+        let stateB = 0;
+
+        // --- REFERENSI DOM ---
+        const elSwitchA = document.getElementById('switch-a');
+        const elSwitchB = document.getElementById('switch-b');
+        const elLabelA = document.getElementById('label-a');
+        const elLabelB = document.getElementById('label-b');
+        const wireA = document.getElementById('wire-a');
+        const wireB = document.getElementById('wire-b');
+        const wireOut = document.getElementById('wire-out');
+        const gateShape = document.getElementById('gate-shape');
+        const gateInvert = document.getElementById('gate-invert');
+        const gateXorBack = document.getElementById('gate-xor-back');
+        const gateLabel = document.getElementById('gate-label');
+        const bulbGlass = document.getElementById('bulb-glass');
+        const tableHead = document.getElementById('table-head');
+        const tableBody = document.getElementById('table-body');
+        const gateMenu = document.getElementById('gate-menu');
+        const descTitle = document.getElementById('desc-title');
+        const descText = document.getElementById('desc-text');
+
+        // --- INISIALISASI MENU GERBANG ---
+        function initMenu() {
+            Object.keys(gateData).forEach(gate => {
+                const btn = document.createElement('button');
+                btn.className = `gate-btn px-4 py-2 rounded-lg font-bold text-sm transition-all duration-200 border border-slate-600 ${gate === currentGate ? 'bg-blue-600 text-white border-blue-500 shadow-[0_0_10px_rgba(37,99,235,0.5)]' : 'bg-slate-700 text-slate-300 hover:bg-slate-600 hover:text-white'}`;
+                btn.innerText = gate;
+                btn.onclick = () => selectGate(gate, btn);
+                gateMenu.appendChild(btn);
+            });
+        }
+
+        // --- LOGIKA UTAMA ---
+        function selectGate(gateName, btnElement) {
+            currentGate = gateName;
+            
+            // Update Menu UI
+            document.querySelectorAll('.gate-btn').forEach(btn => {
+                btn.className = 'gate-btn px-4 py-2 rounded-lg font-bold text-sm transition-all duration-200 border border-slate-600 bg-slate-700 text-slate-300 hover:bg-slate-600 hover:text-white';
+            });
+            btnElement.className = 'gate-btn px-4 py-2 rounded-lg font-bold text-sm transition-all duration-200 border border-blue-500 bg-blue-600 text-white shadow-[0_0_10px_rgba(37,99,235,0.5)]';
+
+            // Reset inputs on change to avoid confusion, or keep them. Let's keep them!
+            updateCircuit();
+        }
+
+        function toggleInput(inputId) {
+            if (inputId === 'A') stateA = stateA === 1 ? 0 : 1;
+            if (inputId === 'B') stateB = stateB === 1 ? 0 : 1;
+            updateCircuit();
+        }
+
+        function updateCircuit() {
+            const data = gateData[currentGate];
+            const isOneInput = data.inputs === 1;
+
+            // 1. Calculate Output
+            const valA = stateA === 1;
+            const valB = stateB === 1;
+            const outBool = isOneInput ? data.calc(valA) : data.calc(valA, valB);
+            const outNum = outBool ? 1 : 0;
+
+            // 2. Update Description
+            descTitle.innerText = currentGate;
+            descText.innerHTML = data.desc;
+            gateLabel.textContent = currentGate;
+
+            // 3. Update Switches UI and Position mapping
+            elSwitchA.innerText = stateA;
+            elSwitchA.className = `switch-node absolute w-12 h-12 md:w-16 md:h-16 rounded-full border-4 text-xl md:text-2xl font-bold text-white mono flex items-center justify-center cursor-pointer z-10 ${stateA ? 'switch-on' : 'switch-off'}`;
+            
+            if (isOneInput) {
+                // NOT Gate Layout
+                elSwitchB.style.display = 'none';
+                elLabelB.style.display = 'none';
+                
+                elSwitchA.style.top = '50%';
+                elLabelA.style.top = 'calc(50% - 40px)';
+                
+                // SVG Path
+                wireA.setAttribute('d', 'M 64 200 L 340 200');
+                wireB.style.display = 'none';
+                
+            } else {
+                // 2-Input Gates Layout
+                elSwitchB.style.display = 'flex';
+                elLabelB.style.display = 'block';
+                
+                elSwitchA.style.top = '25%';
+                elLabelA.style.top = 'calc(25% - 40px)';
+                
+                elSwitchB.innerText = stateB;
+                elSwitchB.className = `switch-node absolute w-12 h-12 md:w-16 md:h-16 rounded-full border-4 text-xl md:text-2xl font-bold text-white mono flex items-center justify-center cursor-pointer z-10 ${stateB ? 'switch-on' : 'switch-off'}`;
+                
+                // Connection point differs slightly by shape
+                const gateInX = currentGate.includes('OR') ? 350 : 340; 
+                
+                wireA.setAttribute('d', `M 64 100 C 200 100, 200 170, ${gateInX} 170`);
+                wireB.setAttribute('d', `M 64 300 C 200 300, 200 230, ${gateInX} 230`);
+                wireB.style.display = 'block';
+            }
+
+            // 4. Update Wires Color
+            wireA.className.baseVal = `wire ${stateA ? 'wire-on' : 'wire-off'}`;
+            if (!isOneInput) {
+                wireB.className.baseVal = `wire ${stateB ? 'wire-on' : 'wire-off'}`;
+            }
+
+            // 5. Update Gate SVG Shape
+            gateShape.setAttribute('d', data.path);
+            
+            // Inverter Circle Logic
+            let outStartX = 460;
+            if (data.invert) {
+                gateInvert.classList.remove('hidden');
+                // Adjust circle position based on shape
+                const cx = (currentGate === 'NOT') ? 450 : 470;
+                gateInvert.setAttribute('cx', cx);
+                gateInvert.setAttribute('cy', 200);
+                outStartX = cx + 10; // Start wire after circle
+            } else {
+                gateInvert.classList.add('hidden');
+                outStartX = (currentGate === 'NOT') ? 440 : 460;
+            }
+
+            // XOR Back line Logic
+            if (data.isXor) {
+                gateXorBack.classList.remove('hidden');
+                gateXorBack.setAttribute('d', 'M 325 140 Q 355 200 325 260');
+            } else {
+                gateXorBack.classList.add('hidden');
+            }
+
+            // Output Wire Path & Color
+            wireOut.setAttribute('d', `M ${outStartX} 200 L 700 200`);
+            wireOut.className.baseVal = `wire ${outNum ? 'wire-on-alt' : 'wire-off'}`;
+
+            // 6. Update Bulb Color
+            bulbGlass.className.baseVal = `bulb-glass ${outNum ? 'bulb-on' : 'bulb-off'}`;
+
+            // 7. Render Truth Table
+            renderTruthTable(isOneInput, data.calc);
+        }
+
+        function renderTruthTable(isOneInput, calcFn) {
+            tableHead.innerHTML = '';
+            tableBody.innerHTML = '';
+
+            const trHead = document.createElement('tr');
+            trHead.className = "text-slate-400 border-b border-slate-700 bg-slate-900/50";
+            
+            if (isOneInput) {
+                trHead.innerHTML = `<th class="py-3 px-4 w-1/2 border-r border-slate-700">A</th><th class="py-3 px-4 w-1/2 text-cyan-400">OUT</th>`;
+                tableHead.appendChild(trHead);
+
+                [0, 1].forEach(a => {
+                    const out = calcFn(a===1) ? 1 : 0;
+                    const isActive = stateA === a;
+                    const tr = document.createElement('tr');
+                    tr.className = `border-b border-slate-700/50 transition-colors ${isActive ? 'bg-blue-900/40 text-blue-300 font-bold' : 'text-slate-300 hover:bg-slate-800'}`;
+                    tr.innerHTML = `
+                        <td class="py-3 px-4 border-r border-slate-700/50">${a}</td>
+                        <td class="py-3 px-4 ${out ? 'text-green-400' : 'text-slate-500'}">${out}</td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+            } else {
+                trHead.innerHTML = `
+                    <th class="py-3 px-4 border-r border-slate-700 w-1/3">A</th>
+                    <th class="py-3 px-4 border-r border-slate-700 w-1/3">B</th>
+                    <th class="py-3 px-4 text-cyan-400 w-1/3">OUT</th>
+                `;
+                tableHead.appendChild(trHead);
+
+                const combinations = [[0,0], [0,1], [1,0], [1,1]];
+                combinations.forEach(([a, b]) => {
+                    const out = calcFn(a===1, b===1) ? 1 : 0;
+                    const isActive = stateA === a && stateB === b;
+                    const tr = document.createElement('tr');
+                    tr.className = `border-b border-slate-700/50 transition-colors ${isActive ? 'bg-blue-900/40 text-blue-300 font-bold' : 'text-slate-300 hover:bg-slate-800'}`;
+                    tr.innerHTML = `
+                        <td class="py-3 px-4 border-r border-slate-700/50">${a}</td>
+                        <td class="py-3 px-4 border-r border-slate-700/50">${b}</td>
+                        <td class="py-3 px-4 ${out ? 'text-green-400' : 'text-slate-500'}">${out}</td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+            }
+        }
+
+        // --- JALANKAN APLIKASI ---
+        window.addEventListener('DOMContentLoaded', () => {
+            initMenu();
+            // Trigger UI awal
+            updateCircuit();
+        });
+
+    </script>
+</body>
+</html>
