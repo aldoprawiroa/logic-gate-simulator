@@ -1,529 +1,129 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulator Gerbang Logika | Sistem Digital</title>
-    <meta name="description" content="Simulator interaktif untuk mempelajari AND, OR, NOT, NAND, NOR, dan XOR melalui input biner, diagram sinyal, dan tabel kebenaran.">
+    <meta name="description" content="Laboratorium logika digital interaktif untuk mempelajari gerbang, adder, subtractor, multiplexer, decoder, comparator, tabel kebenaran, dan ekspresi Boolean.">
     <meta name="theme-color" content="#0f172a">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0f172a;
-            color: #f8fafc;
-        }
-
-        .mono { font-family: 'JetBrains Mono', monospace; }
-
-        .wire {
-            fill: none;
-            stroke-width: 6;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .wire-off {
-            stroke: #64748b;
-        }
-
-        .wire-on {
-            stroke: #22d3ee;
-        }
-
-        .wire-on-alt {
-            stroke: #22d3ee;
-            filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.75));
-        }
-
-        .gate-body {
-            fill: #1e293b;
-            stroke: #64748b;
-            stroke-width: 4;
-            transition: all 0.3s;
-        }
-
-        .gate-active .gate-body {
-            stroke: #22d3ee;
-        }
-
-        .switch-node {
-            transition: all 0.2s;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
-        }
-        .switch-node:hover {
-            transform: translate(-50%, -50%) scale(1.1);
-        }
-        .switch-node:active {
-            transform: translate(-50%, -50%) scale(0.95);
-        }
-        
-        .switch-off {
-            background-color: #334155;
-            border-color: #64748b;
-        }
-        
-        .switch-on {
-            background-color: #0e7490;
-            border-color: #22d3ee;
-        }
-
-        button:focus-visible {
-            outline: 3px solid #67e8f9;
-            outline-offset: 3px;
-        }
-
-        .bulb-glass {
-            transition: all 0.5s ease;
-        }
-        .bulb-off {
-            fill: #1e293b;
-            stroke: #64748b;
-        }
-        .bulb-on {
-            fill: #22d3ee;
-            stroke: #67e8f9;
-            filter: drop-shadow(0 0 12px rgba(34, 211, 238, 0.8));
-        }
-
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #1e293b;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #475569;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #64748b;
-        }
-
-        #canvas-container {
-            aspect-ratio: 2 / 1;
-        }
-
-        @media (max-width: 639px) {
-            #canvas-container {
-                aspect-ratio: 8 / 5;
-            }
-
-            #label-a,
-            #label-b {
-                left: 20% !important;
-                transform: none !important;
-                top: calc(25% - 10px) !important;
-                font-size: 0.75rem;
-            }
-
-            #label-b {
-                top: calc(75% - 10px) !important;
-            }
-
-            #canvas-container.one-input #label-a {
-                top: calc(50% - 10px) !important;
-            }
-
-            #label-out {
-                top: calc(50% + 34px) !important;
-                font-size: 0.75rem;
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            *,
-            *::before,
-            *::after {
-                scroll-behavior: auto !important;
-                transition-duration: 0.01ms !important;
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-            }
-        }
-    </style>
+    <title>Digital Logic Lab | Simulator Sistem Digital</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/styles.css">
 </head>
-<body class="min-h-screen flex flex-col items-center p-4 md:p-8">
-
-    <header class="text-center mb-8">
-        <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-cyan-300 mb-2">
-            Simulator Gerbang Logika
-        </h1>
-        <p class="text-slate-400 font-medium tracking-wide">Alat Bantu Belajar Sistem Digital - UNIMUS</p>
+<body>
+    <header class="lab-header">
+        <div>
+            <p class="lab-kicker">SISTEM DIGITAL · INTERACTIVE LAB</p>
+            <h1>Digital Logic Lab</h1>
+            <p class="lab-subtitle">Eksplorasi gerbang logika dan rangkaian kombinasional melalui input biner, diagram sinyal, ekspresi Boolean, tabel kebenaran, dan latihan prediksi.</p>
+        </div>
+        <div class="header-readout" aria-label="Ringkasan laboratorium">
+            <span>Komponen<strong>14</strong></span>
+            <span>Runtime<strong>Vanilla JS</strong></span>
+        </div>
     </header>
 
-    <main class="w-full max-w-6xl flex flex-col lg:flex-row gap-8">
+    <main class="app-shell">
+        <aside class="panel component-browser" aria-label="Katalog komponen logika">
+            <div class="browser-header">
+                <h2>Katalog komponen</h2>
+                <p id="component-count">14 dari 14 komponen</p>
+            </div>
+            <label class="sr-only" for="component-search">Cari komponen</label>
+            <input id="component-search" class="search-field" type="search" placeholder="Cari AND, adder, MUX..." autocomplete="off">
+            <nav id="component-list" aria-label="Daftar komponen"></nav>
+        </aside>
 
-        <div class="flex-1 flex flex-col gap-4">
-
-            <div class="bg-slate-800 p-3 rounded-2xl border border-slate-700 flex flex-wrap gap-2">
-                <span class="text-slate-300 text-sm w-full font-semibold mb-1 px-2">Pilih gerbang</span>
-                <div class="flex flex-wrap gap-2 w-full" id="gate-menu">
-                    <!-- Buttons injected via JS -->
+        <section class="workspace" aria-labelledby="component-title">
+            <div class="panel workspace-panel">
+                <div class="component-heading">
+                    <div>
+                        <p id="component-category" class="section-kicker">Gerbang</p>
+                        <h2 id="component-title">AND</h2>
+                        <p id="component-summary" class="component-summary"></p>
+                    </div>
+                    <span id="component-category-badge" class="component-category">Interactive</span>
                 </div>
-            </div>
 
-            <div class="relative w-full bg-slate-900 rounded-2xl border-2 border-slate-600 shadow-2xl overflow-hidden" id="canvas-container">
-
-                <svg id="circuit-svg" viewBox="0 0 800 400" class="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true">
-                    <g id="diagram-scale">
-
-                    <path id="wire-a" d="" class="wire wire-off"></path>
-                    <path id="wire-b" d="" class="wire wire-off"></path>
-                    <path id="wire-out" d="" class="wire wire-off"></path>
-
-                    <g id="gate-group" class="gate-active" transform="translate(0,0)">
-
-                        <path id="gate-xor-back" d="" fill="none" class="hidden stroke-slate-500" stroke-width="4"></path>
-
-                        <path id="gate-shape" d="" class="gate-body"></path>
-
-                        <circle id="gate-invert" cx="0" cy="0" r="10" class="hidden gate-body"></circle>
-
-                        <text id="gate-label" x="400" y="205" font-family="JetBrains Mono" font-size="24" font-weight="bold" fill="#94a3b8" text-anchor="middle" dominant-baseline="middle">AND</text>
-                    </g>
-
-                    <g transform="translate(700, 200)">
-
-                        <rect x="-10" y="25" width="20" height="15" rx="2" fill="#475569"></rect>
-                        <rect x="-12" y="40" width="24" height="6" rx="1" fill="#334155"></rect>
-
-                        <path id="bulb-glass" d="M 0 -30 C 25 -30, 25 0, 15 15 C 10 22, 10 25, 10 25 L -10 25 C -10 25, -10 22, -15 15 C -25 0, -25 -30, 0 -30 Z" class="bulb-glass bulb-off stroke-2"></path>
-
-                        <path d="M -5 25 L -5 5 L 5 5 L 5 25" fill="none" stroke="#64748b" stroke-width="2"></path>
-                    </g>
-                    </g>
-                </svg>
-
-
-                <button id="switch-a" class="switch-node absolute w-12 h-12 md:w-16 md:h-16 rounded-full border-4 text-xl md:text-2xl font-bold text-white mono flex items-center justify-center cursor-pointer z-10"
-                        type="button"
-                        aria-pressed="false"
-                        aria-label="Input A, nilai 0. Tekan untuk mengubah."
-                        style="left: 10%; top: 25%; transform: translate(-50%, -50%);"
-                        onclick="toggleInput('A')">
-                    0
-                </button>
-                <div id="label-a" aria-hidden="true" class="absolute text-slate-300 mono font-bold text-sm md:text-base pointer-events-none" style="left: 10%; top: calc(25% - 40px); transform: translateX(-50%);">IN A</div>
-
-                <button id="switch-b" class="switch-node absolute w-12 h-12 md:w-16 md:h-16 rounded-full border-4 text-xl md:text-2xl font-bold text-white mono flex items-center justify-center cursor-pointer z-10"
-                        type="button"
-                        aria-pressed="false"
-                        aria-label="Input B, nilai 0. Tekan untuk mengubah."
-                        style="left: 10%; top: 75%; transform: translate(-50%, -50%);"
-                        onclick="toggleInput('B')">
-                    0
-                </button>
-                <div id="label-b" aria-hidden="true" class="absolute text-slate-300 mono font-bold text-sm md:text-base pointer-events-none" style="left: 10%; top: calc(75% + 25px); transform: translateX(-50%);">IN B</div>
-
-                <div id="label-out" aria-hidden="true" class="absolute text-slate-300 mono font-bold text-sm md:text-base pointer-events-none" style="left: 87.5%; top: calc(50% + 45px); transform: translateX(-50%);">OUT <span id="output-value">0</span></div>
-            </div>
-
-            <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50">
-                <h3 class="text-cyan-300 font-bold mb-1 flex items-center gap-2">
-                    <svg aria-hidden="true" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    Fungsi Gerbang <span id="desc-title">AND</span>
-                </h3>
-                <p id="desc-text" class="text-slate-300 text-sm leading-relaxed">
-                    Menghasilkan output 1 (menyala) hanya jika semua input bernilai 1.
-                </p>
-                <p id="output-status" role="status" aria-live="polite" class="mt-3 text-sm font-semibold text-cyan-200">
-                    Output: 0 (OFF)
-                </p>
-            </div>
-        </div>
-
-        <div class="w-full lg:w-80 flex flex-col gap-4">
-            <div class="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden flex-1 flex flex-col">
-                <div class="p-4 bg-slate-800 border-b border-slate-700">
-                    <h2 class="text-lg font-bold text-white flex items-center gap-2">
-                        <svg aria-hidden="true" class="w-5 h-5 text-cyan-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                        Tabel Kebenaran
-                    </h2>
+                <div class="toolbar" aria-label="Kontrol simulasi">
+                    <button id="randomize-inputs" class="tool-button" type="button">Acak input <span class="mono">R</span></button>
+                    <button id="reset-inputs" class="tool-button" type="button">Reset ke 0</button>
                 </div>
-                <div class="p-4 flex-1 overflow-auto">
-                    <table class="w-full text-center border-collapse">
-                        <caption class="sr-only">Tabel kebenaran untuk gerbang yang sedang dipilih</caption>
-                        <thead id="table-head">
 
-                        </thead>
-                        <tbody id="table-body" class="mono text-sm">
+                <section class="station-section" aria-labelledby="input-heading">
+                    <div class="station-title">
+                        <h3 id="input-heading">Input</h3>
+                        <span>Tombol angka 1-4 dapat digunakan sebagai shortcut</span>
+                    </div>
+                    <div id="input-controls" class="input-bank"></div>
+                </section>
 
-                        </tbody>
+                <section class="station-section" aria-labelledby="diagram-heading">
+                    <div class="station-title">
+                        <h3 id="diagram-heading">Diagram sinyal</h3>
+                        <span>Cyan = logika 1</span>
+                    </div>
+                    <div id="circuit-diagram" class="circuit-board"></div>
+                </section>
+
+                <section class="station-section" aria-labelledby="output-heading">
+                    <div class="station-title">
+                        <h3 id="output-heading">Output</h3>
+                        <span>Status dihitung langsung dari input</span>
+                    </div>
+                    <div id="output-controls" class="output-bank" role="status" aria-live="polite"></div>
+                </section>
+
+                <section class="formula-panel" aria-labelledby="formula-heading">
+                    <div>
+                        <p class="section-kicker" id="formula-heading">BOOLEAN</p>
+                        <div id="formula-list" class="formula-list"></div>
+                    </div>
+                    <div>
+                        <p class="section-kicker">KONSEP</p>
+                        <p id="component-insight" class="insight"></p>
+                    </div>
+                </section>
+            </div>
+        </section>
+
+        <aside class="inspector" aria-label="Analisis komponen">
+            <section class="panel inspector-panel" aria-labelledby="truth-heading">
+                <h2 id="truth-heading">Tabel kebenaran</h2>
+                <p id="truth-meta" class="truth-meta"></p>
+                <div class="truth-wrap">
+                    <table class="truth-table">
+                        <caption class="sr-only">Tabel kebenaran komponen yang sedang dipilih</caption>
+                        <thead id="truth-head"></thead>
+                        <tbody id="truth-body"></tbody>
                     </table>
                 </div>
-            </div>
-        </div>
+            </section>
+
+            <section class="panel challenge-panel" aria-labelledby="challenge-heading">
+                <h2 id="challenge-heading">Mode latihan</h2>
+                <p class="panel-note">Prediksi output berdasarkan input yang diberikan.</p>
+                <div class="challenge-layout">
+                    <div>
+                        <p class="section-kicker">INPUT SOAL</p>
+                        <div id="challenge-inputs" class="challenge-values"></div>
+                    </div>
+                    <div>
+                        <p class="section-kicker">PREDIKSI OUTPUT</p>
+                        <div id="challenge-predictions" class="challenge-predictions"></div>
+                    </div>
+                    <p id="challenge-feedback" class="challenge-feedback" role="status" aria-live="polite" data-result="idle">Atur prediksi output, lalu periksa jawaban.</p>
+                    <div class="challenge-actions">
+                        <button id="challenge-check" class="challenge-button" type="button">Periksa jawaban</button>
+                        <button id="challenge-next" class="challenge-button" type="button" hidden>Soal berikutnya</button>
+                    </div>
+                    <div class="score-line"><span>Skor sesi</span><strong id="challenge-score" class="mono">0/0</strong></div>
+                </div>
+            </section>
+        </aside>
     </main>
 
-    <script>
-
-        const gateData = {
-            'AND': { 
-                inputs: 2, 
-                calc: (a, b) => a && b, 
-                path: 'M 340 140 L 400 140 A 60 60 0 0 1 400 260 L 340 260 Z',
-                invert: false,
-                isXor: false,
-                desc: 'Gerbang dasar. Menghasilkan output 1 (menyala) hanya jika <b>semua</b> input bernilai 1.'
-            },
-            'OR': { 
-                inputs: 2, 
-                calc: (a, b) => a || b, 
-                path: 'M 340 140 Q 385 140 460 200 Q 385 260 340 260 Q 370 200 340 140 Z',
-                invert: false,
-                isXor: false,
-                desc: 'Gerbang dasar. Menghasilkan output 1 (menyala) jika <b>salah satu atau semua</b> input bernilai 1.'
-            },
-            'NOT': { 
-                inputs: 1, 
-                calc: (a) => !a, 
-                path: 'M 340 160 L 440 200 L 340 240 Z',
-                invert: true,
-                isXor: false,
-                desc: 'Gerbang Inverter. Membalikkan logika. Jika input 1 menjadi 0, jika input 0 menjadi 1.'
-            },
-            'NAND': { 
-                inputs: 2, 
-                calc: (a, b) => !(a && b), 
-                path: 'M 340 140 L 400 140 A 60 60 0 0 1 400 260 L 340 260 Z',
-                invert: true,
-                isXor: false,
-                desc: 'Not-AND. Kebalikan dari AND. Menghasilkan output 0 hanya jika semua input bernilai 1.'
-            },
-            'NOR': { 
-                inputs: 2, 
-                calc: (a, b) => !(a || b), 
-                path: 'M 340 140 Q 385 140 460 200 Q 385 260 340 260 Q 370 200 340 140 Z',
-                invert: true,
-                isXor: false,
-                desc: 'Not-OR. Kebalikan dari OR. Menghasilkan output 1 hanya jika semua input bernilai 0.'
-            },
-            'XOR': { 
-                inputs: 2, 
-                calc: (a, b) => a !== b, 
-                path: 'M 340 140 Q 385 140 460 200 Q 385 260 340 260 Q 370 200 340 140 Z',
-                invert: false,
-                isXor: true,
-                desc: 'Exclusive-OR. Menghasilkan output 1 jika kedua input <b>berbeda</b> (satu 1 dan lainnya 0).'
-            }
-        };
-
-        let currentGate = 'AND';
-        let stateA = 0;
-        let stateB = 0;
-
-        const elSwitchA = document.getElementById('switch-a');
-        const elSwitchB = document.getElementById('switch-b');
-        const elLabelA = document.getElementById('label-a');
-        const elLabelB = document.getElementById('label-b');
-        const wireA = document.getElementById('wire-a');
-        const wireB = document.getElementById('wire-b');
-        const wireOut = document.getElementById('wire-out');
-        const gateShape = document.getElementById('gate-shape');
-        const gateInvert = document.getElementById('gate-invert');
-        const gateXorBack = document.getElementById('gate-xor-back');
-        const gateLabel = document.getElementById('gate-label');
-        const bulbGlass = document.getElementById('bulb-glass');
-        const tableHead = document.getElementById('table-head');
-        const tableBody = document.getElementById('table-body');
-        const gateMenu = document.getElementById('gate-menu');
-        const descTitle = document.getElementById('desc-title');
-        const descText = document.getElementById('desc-text');
-        const canvasContainer = document.getElementById('canvas-container');
-        const circuitSvg = document.getElementById('circuit-svg');
-        const diagramScale = document.getElementById('diagram-scale');
-        const outputValue = document.getElementById('output-value');
-        const outputStatus = document.getElementById('output-status');
-
-        function gateButtonClass(isActive) {
-            return isActive
-                ? 'gate-btn min-h-[44px] px-4 py-2 rounded-lg font-bold text-sm transition-colors duration-200 border border-cyan-300 bg-cyan-700 text-white'
-                : 'gate-btn min-h-[44px] px-4 py-2 rounded-lg font-bold text-sm transition-colors duration-200 border border-slate-400 bg-slate-700 text-slate-100 hover:bg-slate-600';
-        }
-
-        function updateResponsiveDiagram() {
-            const isMobile = window.matchMedia('(max-width: 639px)').matches;
-            circuitSvg.setAttribute('viewBox', isMobile ? '0 0 800 500' : '0 0 800 400');
-            diagramScale.setAttribute('transform', isMobile ? 'scale(1 1.25)' : 'scale(1 1)');
-        }
-
-        function initMenu() {
-            Object.keys(gateData).forEach(gate => {
-                const btn = document.createElement('button');
-                const isActive = gate === currentGate;
-                btn.type = 'button';
-                btn.className = gateButtonClass(isActive);
-                btn.innerText = gate;
-                btn.setAttribute('aria-pressed', String(isActive));
-                btn.setAttribute('aria-label', `Pilih gerbang ${gate}`);
-                btn.onclick = () => selectGate(gate, btn);
-                gateMenu.appendChild(btn);
-            });
-        }
-
-        function selectGate(gateName, btnElement) {
-            currentGate = gateName;
-            
-            document.querySelectorAll('.gate-btn').forEach(btn => {
-                const isActive = btn === btnElement;
-                btn.className = gateButtonClass(isActive);
-                btn.setAttribute('aria-pressed', String(isActive));
-            });
-
-            updateCircuit();
-        }
-
-        function toggleInput(inputId) {
-            if (inputId === 'A') stateA = stateA === 1 ? 0 : 1;
-            if (inputId === 'B') stateB = stateB === 1 ? 0 : 1;
-            updateCircuit();
-        }
-
-        function updateCircuit() {
-            const data = gateData[currentGate];
-            const isOneInput = data.inputs === 1;
-
-            const valA = stateA === 1;
-            const valB = stateB === 1;
-            const outBool = isOneInput ? data.calc(valA) : data.calc(valA, valB);
-            const outNum = outBool ? 1 : 0;
-            canvasContainer.classList.toggle('one-input', isOneInput);
-
-            descTitle.innerText = currentGate;
-            descText.innerHTML = data.desc;
-            gateLabel.textContent = currentGate;
-            outputValue.textContent = outNum;
-            outputStatus.textContent = `Output: ${outNum} (${outNum ? 'ON' : 'OFF'})`;
-
-            elSwitchA.innerText = stateA;
-            elSwitchA.setAttribute('aria-pressed', String(stateA === 1));
-            elSwitchA.setAttribute('aria-label', `Input A, nilai ${stateA}. Tekan untuk mengubah.`);
-            elSwitchA.className = `switch-node absolute w-12 h-12 md:w-16 md:h-16 rounded-full border-4 text-xl md:text-2xl font-bold text-white mono flex items-center justify-center cursor-pointer z-10 ${stateA ? 'switch-on' : 'switch-off'}`;
-            
-            if (isOneInput) {
-
-                elSwitchB.style.display = 'none';
-                elLabelB.style.display = 'none';
-                
-                elSwitchA.style.top = '50%';
-                elLabelA.style.top = 'calc(50% - 40px)';
-
-                wireA.setAttribute('d', 'M 80 200 L 340 200');
-                wireB.style.display = 'none';
-                
-            } else {
-
-                elSwitchB.style.display = 'flex';
-                elLabelB.style.display = 'block';
-                
-                elSwitchA.style.top = '25%';
-                elLabelA.style.top = 'calc(25% - 40px)';
-                
-                elSwitchB.innerText = stateB;
-                elSwitchB.className = `switch-node absolute w-12 h-12 md:w-16 md:h-16 rounded-full border-4 text-xl md:text-2xl font-bold text-white mono flex items-center justify-center cursor-pointer z-10 ${stateB ? 'switch-on' : 'switch-off'}`;
-                elSwitchB.setAttribute('aria-pressed', String(stateB === 1));
-                elSwitchB.setAttribute('aria-label', `Input B, nilai ${stateB}. Tekan untuk mengubah.`);
-                
-                const gateInX = currentGate.includes('OR') ? 350 : 340; 
-                
-                wireA.setAttribute('d', `M 80 100 C 200 100, 200 170, ${gateInX} 170`);
-                wireB.setAttribute('d', `M 80 300 C 200 300, 200 230, ${gateInX} 230`);
-                wireB.style.display = 'block';
-            }
-
-            wireA.className.baseVal = `wire ${stateA ? 'wire-on' : 'wire-off'}`;
-            if (!isOneInput) {
-                wireB.className.baseVal = `wire ${stateB ? 'wire-on' : 'wire-off'}`;
-            }
-
-            gateShape.setAttribute('d', data.path);
-
-            let outStartX = 460;
-            if (data.invert) {
-                gateInvert.classList.remove('hidden');
-
-                const cx = (currentGate === 'NOT') ? 450 : 470;
-                gateInvert.setAttribute('cx', cx);
-                gateInvert.setAttribute('cy', 200);
-                outStartX = cx + 10;
-            } else {
-                gateInvert.classList.add('hidden');
-                outStartX = (currentGate === 'NOT') ? 440 : 460;
-            }
-
-            if (data.isXor) {
-                gateXorBack.classList.remove('hidden');
-                gateXorBack.setAttribute('d', 'M 325 140 Q 355 200 325 260');
-            } else {
-                gateXorBack.classList.add('hidden');
-            }
-
-            wireOut.setAttribute('d', `M ${outStartX} 200 L 700 200`);
-            wireOut.className.baseVal = `wire ${outNum ? 'wire-on-alt' : 'wire-off'}`;
-
-            bulbGlass.className.baseVal = `bulb-glass ${outNum ? 'bulb-on' : 'bulb-off'}`;
-
-            renderTruthTable(isOneInput, data.calc);
-        }
-
-        function renderTruthTable(isOneInput, calcFn) {
-            tableHead.innerHTML = '';
-            tableBody.innerHTML = '';
-
-            const trHead = document.createElement('tr');
-            trHead.className = "text-slate-400 border-b border-slate-700 bg-slate-900/50";
-            
-            if (isOneInput) {
-                trHead.innerHTML = `<th scope="col" class="py-3 px-4 w-1/2 border-r border-slate-700">A</th><th scope="col" class="py-3 px-4 w-1/2 text-cyan-300">OUT</th>`;
-                tableHead.appendChild(trHead);
-
-                [0, 1].forEach(a => {
-                    const out = calcFn(a===1) ? 1 : 0;
-                    const isActive = stateA === a;
-                    const tr = document.createElement('tr');
-                    tr.className = `border-b border-slate-700/50 transition-colors ${isActive ? 'bg-slate-700 text-white font-bold' : 'text-slate-300 hover:bg-slate-800'}`;
-                    tr.innerHTML = `
-                        <td class="py-3 px-4 border-r border-slate-700/50">${isActive ? '<span class="sr-only">Kombinasi aktif. </span>' : ''}${a}</td>
-                        <td class="py-3 px-4 ${out ? 'text-cyan-200' : 'text-slate-300'}">${out}</td>
-                    `;
-                    tableBody.appendChild(tr);
-                });
-            } else {
-                trHead.innerHTML = `
-                    <th scope="col" class="py-3 px-4 border-r border-slate-700 w-1/3">A</th>
-                    <th scope="col" class="py-3 px-4 border-r border-slate-700 w-1/3">B</th>
-                    <th scope="col" class="py-3 px-4 text-cyan-300 w-1/3">OUT</th>
-                `;
-                tableHead.appendChild(trHead);
-
-                const combinations = [[0,0], [0,1], [1,0], [1,1]];
-                combinations.forEach(([a, b]) => {
-                    const out = calcFn(a===1, b===1) ? 1 : 0;
-                    const isActive = stateA === a && stateB === b;
-                    const tr = document.createElement('tr');
-                    tr.className = `border-b border-slate-700/50 transition-colors ${isActive ? 'bg-slate-700 text-white font-bold' : 'text-slate-300 hover:bg-slate-800'}`;
-                    tr.innerHTML = `
-                        <td class="py-3 px-4 border-r border-slate-700/50">${isActive ? '<span class="sr-only">Kombinasi aktif. </span>' : ''}${a}</td>
-                        <td class="py-3 px-4 border-r border-slate-700/50">${b}</td>
-                        <td class="py-3 px-4 ${out ? 'text-cyan-200' : 'text-slate-300'}">${out}</td>
-                    `;
-                    tableBody.appendChild(tr);
-                });
-            }
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            updateResponsiveDiagram();
-            initMenu();
-            updateCircuit();
-        });
-
-        window.addEventListener('resize', updateResponsiveDiagram);
-
-    </script>
+    <script type="module" src="assets/js/app.js"></script>
 </body>
 </html>
