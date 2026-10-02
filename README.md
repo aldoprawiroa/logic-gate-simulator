@@ -1,43 +1,98 @@
-# Logic Gate Simulator
+# Digital Logic Lab
 
-![Logic Gate Simulator Demo](assets/img/logic-gate-simulator.jpg)
+Digital Logic Lab adalah aplikasi web statis untuk mempelajari gerbang logika dan rangkaian kombinasional melalui simulasi biner, diagram sinyal, ekspresi Boolean, tabel kebenaran, dan latihan prediksi output.
 
-Aplikasi web interaktif untuk mempelajari gerbang logika melalui input biner, visualisasi sinyal, status output, dan tabel kebenaran.
+**Live demo:** https://aldoprawiroa.github.io/logic-gate-simulator/
 
-**[Buka live demo](https://aldoprawiroa.github.io/logic-gate-simulator/)**
+## Cakupan komponen
+
+### Gerbang
+- AND
+- OR
+- NOT
+- NAND
+- NOR
+- XOR
+- XNOR
+
+### Aritmetika
+- Half Adder
+- Full Adder
+- Half Subtractor
+- Full Subtractor
+
+### Routing
+- Multiplexer 2:1
+- Decoder 2-to-4 dengan Enable
+
+### Komparasi
+- Comparator 2-bit
 
 ## Fitur
 
-- Mendukung enam gerbang: AND, OR, NOT, NAND, NOR, dan XOR.
-- Input A dan B dapat diubah langsung antara 0 dan 1. Gerbang NOT menggunakan satu input.
-- Diagram SVG memperlihatkan jalur sinyal aktif dan tidak aktif secara real-time.
-- Status output tersedia secara visual dan sebagai teks ON/OFF.
-- Tabel kebenaran diperbarui otomatis dan menandai kombinasi input yang sedang aktif.
-- Antarmuka menggunakan tema gelap dengan kontras dan state yang dirancang untuk pembacaan diagram digital.
-- Kontrol dapat digunakan dengan keyboard dan menyediakan focus state yang terlihat.
-- Layout circuit menyesuaikan ruang vertikal pada layar sempit agar tidak sekadar mengecilkan layout desktop.
+- Input interaktif dengan status 0/1 dan shortcut keyboard.
+- Diagram sinyal SVG yang berubah sesuai state input dan output.
+- Dukungan komponen dengan satu sampai empat input dan satu sampai empat output.
+- Tabel kebenaran otomatis untuk seluruh kombinasi input, termasuk 16 baris pada Comparator 2-bit.
+- Ekspresi Boolean dan penjelasan konsep per komponen.
+- Pencarian katalog komponen.
+- Randomize dan reset input.
+- Hash URL per komponen, misalnya `#full-adder`.
+- Mode latihan untuk memprediksi output dan mencatat skor sesi.
+- State aksesibel melalui teks, `aria-pressed`, focus indicator, dan status output yang tidak bergantung pada warna saja.
+- Responsive layout untuk mobile, tablet, dan desktop.
+- `prefers-reduced-motion` untuk pengguna yang membatasi animasi.
 
-## Teknologi
+## Arsitektur
 
-- HTML5 untuk struktur halaman.
-- SVG untuk diagram gerbang, kabel, dan indikator output.
-- CSS3 dan Tailwind CSS via CDN untuk layout dan styling.
-- Vanilla JavaScript untuk state, perhitungan gerbang, dan pembaruan UI.
+```text
+logic-gate-simulator/
+├─ index.html
+├─ assets/
+│  ├─ css/
+│  │  └─ styles.css
+│  ├─ img/
+│  └─ js/
+│     ├─ app.js
+│     ├─ catalog.js
+│     └─ logic-core.js
+├─ tests/
+│  └─ logic-core.test.mjs
+├─ .github/
+│  └─ workflows/
+│     └─ test.yml
+├─ DESIGN.md
+└─ package.json
+```
 
-## Cara menggunakan
+`logic-core.js` berisi operasi Boolean murni dan pembentuk truth table. `catalog.js` mendefinisikan komponen sebagai data. `app.js` menangani state dan rendering DOM. Pemisahan ini membuat komponen baru dapat ditambahkan tanpa menumpuk logika di `index.html`.
 
-1. Buka live demo.
-2. Pilih jenis gerbang melalui tombol pada bagian **Pilih gerbang**.
-3. Tekan input A atau B untuk mengubah nilainya antara 0 dan 1.
-4. Amati perubahan jalur sinyal dan status output.
-5. Cocokkan kondisi tersebut dengan baris aktif pada tabel kebenaran.
+## Menjalankan secara lokal
 
-## Arah desain
+Karena JavaScript memakai ES modules, jalankan melalui HTTP server lokal.
 
-Keputusan visual dan accessibility proyek didokumentasikan di [DESIGN.md](DESIGN.md).
+```bash
+python -m http.server 8000
+```
 
-## Target pengguna
+Lalu buka `http://localhost:8000`.
 
-Simulator ini ditujukan untuk mahasiswa dan pelajar yang sedang mempelajari dasar Sistem Digital atau logika Boolean dan membutuhkan cara interaktif untuk menghubungkan tabel kebenaran dengan perilaku rangkaian.
+## Testing
+
+Test memakai test runner bawaan Node.js tanpa test framework eksternal.
+
+```bash
+npm test
+```
+
+Test mencakup gerbang dasar, adder/subtractor, MUX, decoder, comparator, kelengkapan truth table, dan integritas katalog komponen.
+
+## Deployment
+
+Proyek tetap kompatibel dengan GitHub Pages karena seluruh runtime berupa file statis. Tidak diperlukan backend atau build step untuk deployment.
+
+## Design direction
+
+Arah visual, hierarchy, motion, dan accessibility didokumentasikan di [DESIGN.md](DESIGN.md).
 
 Created by [aldoprawiroa](https://github.com/aldoprawiroa).
