@@ -1,32 +1,43 @@
-# 🔌 Logic Gate Simulator
+# Logic Gate Simulator
 
 ![Logic Gate Simulator Demo](assets/img/logic-gate-simulator.jpg)
 
-Sebuah aplikasi web interaktif dan minimalis untuk memvisualisasikan dan mensimulasikan cara kerja gerbang logika (Logic Gates). Proyek ini dirancang khusus untuk membantu mahasiswa IT pemula dan siswa yang sedang mempelajari mata kuliah Sistem Digital.
+Aplikasi web interaktif untuk mempelajari gerbang logika melalui input biner, visualisasi sinyal, status output, dan tabel kebenaran.
 
-🌐 **[Coba Live Demo Disini](https://aldoprawiroa.github.io/logic-gate-simulator/)**
+**[Buka live demo](https://aldoprawiroa.github.io/logic-gate-simulator/)**
 
-## ✨ Fitur Utama
-- **Simulasi Komprehensif:** Mendukung gerbang dasar (AND, OR, NOT) dan lanjutan (NAND, NOR, XOR, XNOR).
-- **Interaktif & Real-time:** Klik pada input untuk mengubah nilai (0/1), dan saksikan perubahan output serta aliran listrik secara langsung.
-- **Visualisasi Aliran Listrik:** Animasi jalur kabel yang menyala (ON) dan mati (OFF) membantu memahami konsep arsitektur sirkuit.
-- **Tabel Kebenaran Otomatis:** Dilengkapi *Truth Table* yang ter-highlight secara otomatis sesuai dengan kombinasi input yang sedang berjalan.
-- **Dark/Light Mode:** Dukungan tema gelap dan terang secara native (menyimpan preferensi pengguna).
+## Fitur
 
-## 🛠️ Teknologi yang Digunakan
-- **HTML5:** Struktur semantik dan Canvas/SVG untuk visualisasi sirkuit.
-- **CSS3:** Styling dengan pendekatan *Minimalist Flat Design*, transisi, dan animasi *keyframes* tanpa framework tambahan.
-- **Vanilla JavaScript:** Manipulasi DOM dan logika kalkulasi gerbang secara murni.
+- Mendukung enam gerbang: AND, OR, NOT, NAND, NOR, dan XOR.
+- Input A dan B dapat diubah langsung antara 0 dan 1. Gerbang NOT menggunakan satu input.
+- Diagram SVG memperlihatkan jalur sinyal aktif dan tidak aktif secara real-time.
+- Status output tersedia secara visual dan sebagai teks ON/OFF.
+- Tabel kebenaran diperbarui otomatis dan menandai kombinasi input yang sedang aktif.
+- Antarmuka menggunakan tema gelap dengan kontras dan state yang dirancang untuk pembacaan diagram digital.
+- Kontrol dapat digunakan dengan keyboard dan menyediakan focus state yang terlihat.
+- Layout circuit menyesuaikan ruang vertikal pada layar sempit agar tidak sekadar mengecilkan layout desktop.
 
-## 🚀 Cara Penggunaan
-1. Buka aplikasi melalui link Live Demo.
-2. Gunakan **Dropdown Menu** untuk memilih jenis gerbang logika yang ingin dipelajari.
-3. Klik pada kotak **IN A** atau **IN B** untuk mengubah status sinyal (0 untuk OFF, 1 untuk ON).
-4. Perhatikan animasi aliran listrik pada kabel dan status lampu Output (menyala kuning jika 1).
-5. Baca penjelasan singkat dan amati Tabel Kebenaran di bagian bawah untuk memperdalam pemahaman.
+## Teknologi
 
-## 🎯 Target Pengguna & Nilai Edukasi
-Aplikasi ini ditujukan bagi **Mahasiswa Sistem Informasi, Teknik Informatika, Ilmu Komputer**, atau siapa saja yang baru belajar dasar elektronika digital. Nilai edukasi utamanya adalah mengubah teori abstrak gerbang logika dan tabel kebenaran menjadi visualisasi yang nyata, interaktif, dan mudah diuji coba.
+- HTML5 untuk struktur halaman.
+- SVG untuk diagram gerbang, kabel, dan indikator output.
+- CSS3 dan Tailwind CSS via CDN untuk layout dan styling.
+- Vanilla JavaScript untuk state, perhitungan gerbang, dan pembaruan UI.
 
----
-**Created by [aldoprawiroa](https://github.com/aldoprawiroa)**
+## Cara menggunakan
+
+1. Buka live demo.
+2. Pilih jenis gerbang melalui tombol pada bagian **Pilih gerbang**.
+3. Tekan input A atau B untuk mengubah nilainya antara 0 dan 1.
+4. Amati perubahan jalur sinyal dan status output.
+5. Cocokkan kondisi tersebut dengan baris aktif pada tabel kebenaran.
+
+## Arah desain
+
+Keputusan visual dan accessibility proyek didokumentasikan di [DESIGN.md](DESIGN.md).
+
+## Target pengguna
+
+Simulator ini ditujukan untuk mahasiswa dan pelajar yang sedang mempelajari dasar Sistem Digital atau logika Boolean dan membutuhkan cara interaktif untuk menghubungkan tabel kebenaran dengan perilaku rangkaian.
+
+Created by [aldoprawiroa](https://github.com/aldoprawiroa).
